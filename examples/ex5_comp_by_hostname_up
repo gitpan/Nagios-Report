@@ -1,11 +1,5 @@
 #!/usr/bin/perl
 
-# $Id: ex5_comp_by_hostname_up,v 1.1 2005-11-08 12:26:02+11 sh1517 Exp sh1517 $
-
-# $Log: ex5_comp_by_hostname_up,v $
-# Revision 1.1  2005-11-08 12:26:02+11  sh1517
-# Initial revision
-#
 
 use strict ;
 

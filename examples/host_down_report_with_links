@@ -1,14 +1,5 @@
 #!/usr/bin/perl
 
-# $Id: host_down_report_with_links,v 1.2 2005-12-01 14:27:35+11 sh1517 Exp sh1517 $
-
-# $Log: host_down_report_with_links,v $
-# Revision 1.2  2005-12-01 14:27:35+11  sh1517
-# 1 Change usage and option processing to allow the 'at' style time periods.
-#
-# Revision 1.1  2005-11-30 14:53:49+11  sh1517
-# Initial revision
-#
 
 use strict ;
 

@@ -1,11 +1,5 @@
 #!/usr/bin/perl
 
-# $Id: ex_iterator,v 1.1 2005-12-23 19:46:38+11 sh1517 Exp sh1517 $
-
-# $Log: ex_iterator,v $
-# Revision 1.1  2005-12-23 19:46:38+11  sh1517
-# Initial revision
-#
 
 use strict ;
 

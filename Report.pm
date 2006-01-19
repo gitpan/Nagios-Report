@@ -2,8 +2,6 @@ package Nagios::Report;
 
 use strict;
 
-# $Id: Report.pm,v 1.66 2006-01-14 20:10:05+11 sh1517 Exp sh1517 $
-
 use base 'Exporter' ;
 use Time::Local ;
 
@@ -16,7 +14,7 @@ use vars qw($VERSION @EXPORT @EXPORT_OK %stime_etime);
 
 @EXPORT = qw(d2t t2hms comp max_l %st_et i2t) ;
 
-$VERSION = '0.015';
+$VERSION = '0.001';
 
 use constant REQUEST_METHOD		=> 'GET' ;
 

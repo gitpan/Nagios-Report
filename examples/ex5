@@ -1,15 +1,5 @@
 #!/usr/bin/perl
 
-# $Id: ex5,v 1.2 2005-12-18 16:47:17+11 sh1517 Exp sh1517 $
-
-# $Log: ex5,v $
-# Revision 1.2  2005-12-18 16:47:17+11  sh1517
-# 1 Add auth parms to local_cgi data source tag (formerly these
-#   had been hard coded in the object).
-#
-# Revision 1.1  2005-11-08 12:16:05+11  sh1517
-# Initial revision
-#
 
 use strict ;
 

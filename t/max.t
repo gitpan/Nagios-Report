@@ -1,11 +1,5 @@
 #!/usr/bin/perl -w
 
-# $Id: max.t,v 1.1 2005-11-07 19:32:04+11 sh1517 Exp sh1517 $
-
-# $Log: max.t,v $
-# Revision 1.1  2005-11-07 19:32:04+11  sh1517
-# Initial revision
-#
 
 use Test;
 

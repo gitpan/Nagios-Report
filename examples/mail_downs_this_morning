@@ -1,9 +1,5 @@
 #!/usr/bin/perl -w
 
-# $Id$
-
-# $Log$
-
 use strict ;
 
 my @recip = qw(

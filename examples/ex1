@@ -1,34 +1,5 @@
 #!/usr/bin/perl
 
-# $Id: ex1,v 1.5 2005-12-18 16:27:40+11 sh1517 Exp sh1517 $
-
-# $Log: ex1,v $
-# Revision 1.5  2005-12-18 16:27:40+11  sh1517
-# 1 Change test data to be default 24x7 data.
-#
-# Revision 1.4  2005-12-18 16:25:36+11  sh1517
-# 1 Read test data from the __DATA__ handle (instead of using test data
-#   provided by the class).
-#   This follows changes to Report.pm to have the 'dev_debug' data source
-#   have a parm consisting of the name (sym ref) of a callback in the client
-#   that will provide the test data.
-#
-# Revision 1.3  2005-10-29 10:02:17+10  sh1517
-# 1 Change commentary to clearly indicate that even when the
-#   callbacks are called with an argument list containing
-#   name value pairs, the list cannot be used as a hash.
-#   $_{HOST_NAME} is __NOT__ correct.
-#
-# The list __must__ be copied to a hash for use as a hash; there
-# is no escape from %F (record vals as hash) or %f (record slot
-# indices) in the callbacks.
-#
-# Revision 1.2  2005-10-29 09:48:06+10  sh1517
-# 1 Commentary changes.
-#
-# Revision 1.1  2005-10-29 09:39:48+10  sh1517
-# Initial revision
-#
 
 use strict ;
 

@@ -1,11 +1,5 @@
 #!/usr/bin/perl -w
 
-# $Id: before_start.t,v 1.1 2005-11-28 16:06:51+11 sh1517 Exp sh1517 $
-
-# $Log: before_start.t,v $
-# Revision 1.1  2005-11-28 16:06:51+11  sh1517
-# Initial revision
-#
 
 use Test;
 

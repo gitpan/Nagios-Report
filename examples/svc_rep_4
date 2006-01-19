@@ -1,11 +1,5 @@
 #!/usr/bin/perl
 
-# $Id: svc_rep_4,v 1.1 2005-12-14 16:06:06+11 sh1517 Exp sh1517 $
-
-# $Log: svc_rep_4,v $
-# Revision 1.1  2005-12-14 16:06:06+11  sh1517
-# Initial revision
-#
 
 use strict ;
 

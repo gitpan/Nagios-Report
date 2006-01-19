@@ -1,13 +1,5 @@
 #!/usr/bin/perl
 
-# $Id: Nagios_Availability_Report-MTD,v 1.2 2005-11-24 19:11:13+11 sh1517 Exp sh1517 $
-
-# $Log: Nagios_Availability_Report-MTD,v $
-# Revision 1.2  2005-11-24 19:11:13+11  sh1517
-# 1 Add the two report periods to the constructor call (no
-#   longer default since 0.012 of Nagios::Report).
-#
-
 use strict ;
 
 use Nagios::Report ;

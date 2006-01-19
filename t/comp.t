@@ -1,11 +1,5 @@
 #!/usr/bin/perl -w
 
-# $Id: comp.t,v 1.1 2005-12-18 17:00:43+11 sh1517 Exp sh1517 $
-
-# $Log: comp.t,v $
-# Revision 1.1  2005-12-18 17:00:43+11  sh1517
-# Initial revision
-#
 
 use Test;
 

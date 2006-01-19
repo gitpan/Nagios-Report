@@ -1,11 +1,5 @@
 #!/usr/bin/perl
 
-# $Id: ex5a_Test,v 1.1 2005-12-22 16:23:01+11 sh1517 Exp sh1517 $
-
-# $Log: ex5a_Test,v $
-# Revision 1.1  2005-12-22 16:23:01+11  sh1517
-# Initial revision
-#
 
 use strict ;
 
