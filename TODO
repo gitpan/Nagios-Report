@@ -1,0 +1,129 @@
+Sat Oct 29 09:20:20 EST 2005
+
+ - round percents to 1 dec place (certainly in debug_dump() possibly in new()).
+
+ - think about having an extra field in each row in debug dump.
+
+ - the debug_dump should have a top of form format that includes the
+   field headers (you need to actually understand the format stuff)
+
+ - complete trans() XXXX - trans() is now absorbed by mkreport().
+
+Mon Oct 31 07:57:13 EST 2005
+
+ - think about exporting useful functions for use by callbacks
+   (eg by uptime ascending), min(), time2ddhhmmss() etc.
+
+ - think about reworking new field processing in mkreport() so that new fields
+   can be added anywhere (where the caller specifies [by for example splicing
+   the new fields rather than pushing them) and mkreport updates the 
+   list of fieldnames in the object to preserve that order.
+
+   Potential way forward is
+
+   1 append new fields to the array in memory
+
+   2 feed the new fields back to mkreport() and then update a per report
+     hash FIELDS with the complete set of fieldnames and offsets (ie the
+     fields added by alter() and the last offsets from the array in core.
+
+   3 Use this hash as a mask via a slice to copy the fields from 
+     core to the object.
+
+- write some tests - to difficult to think about advancing otherwise.
+
+Tue Nov  1 13:39:25 EST 2005
+
+ - Need to replace thismonth time ranges in URLs by absolute time periods
+   (time_t) since otherwise the links are stale after a month.
+
+Thu Nov 10 10:48:11 EST 2005
+
+- Modify constructor - and examples and tests - to take an optional extra
+  parm specifying the timeperiod to report on. Have this default to this
+  month (as current behaviour). This means that the current report_period
+  array parm __must__ change to be an optional array ref.
+
+Thu Nov 17 17:48:40 EST 2005
+
+- whole batch of things including
+
+1 provide an option to mkreport to download the event log entries for the host
+(instead of the hyperlink)
+
+These entries look like
+
+<tr><th class='logEntries'>Event Start Time</th><th class='logEntries'>Event End Time</th><th class='logEntries'>Event Duration</th
++><th class='logEntries'>Event/State Type</th><th class='logEntries'>Event/State Information</th></tr>
+<tr class='logEntriesEven'><td class='logEntriesEven'>01-11-2005 00:00:00</td><td class='logEntriesEven'>09-11-2005 15:09:59</td><t
++d class='logEntriesEven'>8d 15h 9m 59s</td><td class='logEntriesUP'>HOST UP (HARD)</td><td class='logEntriesEven'>PING OK - Packet
++ loss = 50%, RTA = 1140.84 ms</td></tr>
+
+Lynx renders the avail report like so
+
+              Service                  % Time OK      % Time Warning  % Time Unknown  % Time Critical % Time Undetermined
+    Ethernet interface reachability 99.951% (99.951%)   0.000% (0.000%) 0.000% (0.000%) 0.049% (0.049%) 0.000%
+    Optus CE interface reachability 100.000% (100.000%) 0.000% (0.000%) 0.000% (0.000%) 0.000% (0.000%) 0.000%
+    network reachability            99.951% (99.951%)   0.000% (0.000%) 0.000% (0.000%) 0.049% (0.049%) 0.000%
+    Average                         99.967% (99.967%)   0.000% (0.000%) 0.000% (0.000%) 0.033% (0.033%) 0.000%
+
+                                                       Host Log Entries:     
+
+                                                   [ View full log entries ]
+
+        Event Start Time     Event End Time    Event Duration Event/State Type          Event/State Information
+       01-11-2005 00:00:00 09-11-2005 15:09:59 8d 15h 9m 59s  HOST UP (HARD)   PING OK - Packet loss = 0%, RTA = 68.34 ms
+
+
+
+2 provide an option to the constructor to
+
+2.1 specify username and password
+
+2.2 get the data from a remote web server (ie the reporter does not have to be on the same host as Nagios)
+
+- make the data getters closures that bind the username, password together with the method to get the date
+- deal with the fact that the closures will have to be generated before the method is called (since you
+may not want to use it all the time).
+
+3 get rid some of the dev specific junk in the text such as
+
+3.1 the DEST sample date (use the Test data only; no need for more than one set of data)
+
+3.2 my username ...
+
+Thu Nov 24 15:02:27 EST 2005
+
+1 Remove personal data from examples
+
+2 Add caller to bail messages
+
+3 Die when non existent programs invoked
+
+4 Prepare new arhive, sans ci commentary for distribution.
+
+Fri Dec 16 19:14:55 EST 2005
+
+1 Add some accessors to let caller get the field names etc
+
+2 Don't init the object; we are too stupid to be sub-classed.
+
+3 Replace dev_debug data source by a call-back that the user
+supplies to initialise the avail_rep.
+
+Sun Dec 18 16:57:52 EST 2005
+
+1 examples/ex3 does _not_ display added fields ... (BUG).
+
+Thu Dec 22 18:09:56 EST 2005 0.015
+
+Bug in ex3 fixed ...
+
+Will remove the tests for alter and add_downs in mkreport()
+(moving them back into the loop ..) to see if doing so 
+
+. improves perf
+
+. reduces code size
+
+

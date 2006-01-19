@@ -1,0 +1,134 @@
+head	1.3;
+access;
+symbols;
+locks
+	sh1517:1.3; strict;
+comment	@# @;
+
+
+1.3
+date	2005.12.18.05.45.23;	author sh1517;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2005.11.08.01.09.22;	author sh1517;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2005.10.30.21.37.54;	author sh1517;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@1 Add auth parms to local_cgi data source tag (in constructor).
+@
+text
+@#!/usr/bin/perl
+
+# $Id: ex4b,v 1.2 2005-11-08 12:09:22+11 sh1517 Exp sh1517 $
+
+# $Log: ex4b,v $
+# Revision 1.2  2005-11-08 12:09:22+11  sh1517
+# 1 Replace sort subroutine by use of comp().
+#
+# Revision 1.1  2005-10-31 08:37:54+11  sh1517
+# Initial revision
+#
+
+use strict ;
+
+use Nagios::Report ;
+
+my $x = Nagios::Report->new(q<local_cgi nms sh1517>)
+  or die "Can't construct Nagios::Report object." ;
+
+$x->mkreport(
+		[ qw(HOST_NAME PERCENT_TOTAL_TIME_UP TOTAL_TIME_DOWN TIME_DOWN_HMS TOTAL_TIME_UNREACHABLE TIME_UNREACH_HMS) ],
+
+		sub {
+			my %F = @@_; my $u = $F{PERCENT_TOTAL_TIME_UP}; $u =~ s/%//; $u < 100
+		    },
+
+		&comp( alpha => 0, ascend => 0, fields => [qw(TOTAL_TIME_DOWN TOTAL_TIME_UNREACHABLE)] ),
+
+		sub {	$_ = shift @@_; my %F = @@_;
+			my $d = $F{TOTAL_TIME_DOWN} ;
+			my $u = $F{TOTAL_TIME_UNREACHABLE} ;
+			push @@$_, 
+				&t2hms($d),
+				&t2hms($u) ;
+			qw(TIME_DOWN_HMS TIME_UNREACH_HMS)
+		}
+) ;
+
+
+
+$x->debug_dump ;
+@
+
+
+1.2
+log
+@1 Replace sort subroutine by use of comp().
+@
+text
+@d3 1
+a3 1
+# $Id: ex4b,v 1.1 2005-10-31 08:37:54+11 sh1517 Exp sh1517 $
+d6 3
+d17 1
+a17 1
+my $x = Nagios::Report->new(q<local_cgi>)
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d3 1
+a3 1
+# $Id$
+d5 4
+a8 1
+# $Log$
+a16 14
+sub by_down_time { 
+  my %f = @@_ ;
+  my $d = $f{TOTAL_TIME_DOWN} ;
+  my $u = $f{TOTAL_TIME_UNREACHABLE} ;
+							# $a, $b are package globals (in same package as sort call)
+							# ==> if the callback refers to $a and $b in the default
+							# package (main::), they will have null values in the
+							# package where the sort takes place.
+  package Nagios::Report ;
+  my $x = $a->[$d] >= $a->[$u] ? $a->[$d] : $a->[$u] ;
+  my $y = $b->[$d] >= $b->[$u] ? $b->[$d] : $b->[$u] ;
+  $y <=> $x ;
+}
+
+d18 1
+a18 1
+		[ qw(HOST_NAME PERCENT_TOTAL_TIME_UP TOTAL_TIME_DOWN TOTAL_TIME_UNREACHABLE AVAIL_URL) ],
+d21 1
+a21 2
+			my %F = @@_; my $u = $F{PERCENT_TOTAL_TIME_UP}; $u =~ s/%//;
+			$u < 98 && $F{HOST_NAME} !~ /^Bend/
+d24 1
+a24 1
+		\&by_down_time,
+d30 3
+a32 3
+				&Nagios::Report::time2ddhhmmss($d),
+				&Nagios::Report::time2ddhhmmss($u) ;
+			qw(TIME_DOWN_HHMMSS TIME_UNREACH_HHMMSS)
+@

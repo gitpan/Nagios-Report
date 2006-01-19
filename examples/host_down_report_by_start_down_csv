@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+
+# $Id: host_down_report_by_start_down_csv,v 1.3 2005-12-14 09:21:28+11 sh1517 Exp sh1517 $
+
+# $Log: host_down_report_by_start_down_csv,v $
+# Revision 1.3  2005-12-14 09:21:28+11  sh1517
+# 1 Tidy up.
+#
+# Revision 1.2  2005-12-13 19:45:54+11  sh1517
+# 1 Fix int2time. Not a pretty story.
+#
+# Revision 1.1  2005-12-12 10:34:07+11  sh1517
+# Initial revision
+#
+
+use strict ;
+
+use Nagios::Report ;
+use Getopt::Std ;
+
+use vars qw($opt_t) ;
+
+use constant  T => { w => 7*86_400, d => 86_400, h => 60*60, m => 60, s => 1 } ;
+
+getopt 't' ;
+
+my $usage = <<USAGE ;
+
+$0 -t <timeperiod>
+
+Displays those hosts with less than 100% total time up during the timeperiod.
+
+timeperiod ::= today     | yesterday   |
+	       thisweek  | lastweek    |
+	       thismonth | lastmonth   |
+	       thisyear  | lastyear    |
+               last12hours | last24hours | last7days | last31days |
+	       HHMM      | HH::MM      |
+	       DD.MM.YY  | DD.MM.YYYY  | MM/DD/YY | MM/DD/YYYY    |
+	       24hourtime date
+
+eg $0 -t 07:00 01.12.2005
+
+USAGE
+
+die $usage
+  unless $opt_t ;
+
+die $usage
+  unless $opt_t =~ m#^(?:
+			today										|
+			yesterday									|
+			this (?:week|month|year)							|
+			last (?:week|month|year|24hours|12hours|7days|31days|\d+days?|\d+hours?) 	|
+			(?: \d\d :? \d\d  \s+  \d\d? [\./] \d\d? [\./] \d\d (?:\d\d)?)			|
+			(?: \d\d :? \d\d)								|
+			(?: \d\d? [\./] \d\d? [\./] \d\d (?:\d\d)?)
+		     )$#x ;
+
+
+my $x = Nagios::Report->new(q<local_cgi NagServer AuthUser>, [ qw(24x7) ], $opt_t, 0, sub { my %F = @_; my $u = $F{PERCENT_TOTAL_TIME_UP}; $u =~ s/%//; $u < 100 },)
+  or die "Can't construct Nagios::Report object." ;
+
+$x->mkreport(
+		[ qw(
+			HOST_NAME
+			DOWN
+			UP
+			OUTAGE
+		   )
+	       ],
+
+		sub { my %F = @_; my $d = $F{OUTAGE} ; &int2time($d) > 300 },
+
+		sub { 
+			my %f = @_ ;
+			d2t($Nagios::Report::a->[$f{DOWN}])	<=>
+			d2t($Nagios::Report::b->[$f{DOWN}]) ;
+		},
+			
+		undef,
+
+		1,
+) ;
+
+
+
+$x->csv_dump() ;
+
+sub int2time {
+  local $_ = shift @_ ;
+  my $t = 0 ;
+  foreach my $x ( /(\d+[wdhms])/g ) {
+							# XXX
+							# Would be nice to do this without two matches but
+							# /g only counts the first match not the pair.
+    my ($u, $b) = $x =~ /(\d+)([wdhms])/ ;
+    $t += T->{$b} * $u ;
+  }
+
+  return $t ;
+
+}

@@ -1,0 +1,82 @@
+head	1.1;
+access;
+symbols;
+locks
+	sh1517:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2005.12.18.05.32.45;	author sh1517;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#!/usr/bin/perl
+
+# $Id: ex1f,v 1.1 2005-11-24 17:44:36+11 sh1517 Exp sh1517 $
+
+# $Log: ex1f,v $
+# Revision 1.1  2005-11-24 17:44:36+11  sh1517
+# Initial revision
+#
+
+use strict ;
+
+use Nagios::Report ;
+
+my $hostname_re = shift @@ARGV ;
+$hostname_re
+  or die <<USAGE;
+$0 <hostname | hostname_pattern>
+
+Extracts Nagios Availability report data for host(s) matching the regex argument.
+eg $0 ^Alb
+USAGE
+
+my $host_re = qr/$hostname_re/ 
+  or die "Can't compile hostname regex '$hostname_re'." ;
+
+my $x = Nagios::Report->new(q<web_page nms sh1517 Fgsltwhg>, [q<24x7>])
+  or die "Can't construct Nagios::Report object." ;
+
+							# Only display these fields in this order.
+my @@these_fields = qw(
+  HOST_NAME
+  DOWN
+  UP
+  OUTAGE
+) ;
+
+$x->mkreport(
+							# Display these fields only (in the order of the list)
+
+
+		\@@these_fields,
+							# Record selector
+
+
+		sub { my %F = @@_; my $h = $F{HOST_NAME}; $h =~ /$host_re/ },
+
+							# Sort order
+
+		undef,
+
+							# Munge callback
+		undef,
+							# Enumerate outages.
+
+		1,
+) ;
+
+$x->debug_dump(40, 4) ;
+@
