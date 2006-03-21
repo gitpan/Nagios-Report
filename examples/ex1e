@@ -17,7 +17,7 @@ USAGE
 my $host_re = qr/$hostname_re/ 
   or die "Can't compile hostname regex '$hostname_re'." ;
 
-my $x = Nagios::Report->new(q<web_page NagServer AuthUser Pw>, [q<24x7 Optus_DEST_SLA_hours>])
+my $x = Nagios::Report->new(q<web_page Nagios_Server Auth_Nagios_User Fgsltwhg>, [q<24x7 Optus_DEST_SLA_hours>])
   or die "Can't construct Nagios::Report object." ;
 
 

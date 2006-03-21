@@ -29,12 +29,18 @@ $x->mkreport(
 
 		\&by_down_time,
 
-		sub {	$_ = shift @_; my %F = @_;
-			my $d = $F{TOTAL_TIME_DOWN} ;
-			my $u = $F{TOTAL_TIME_UNREACHABLE} ;
-			push @$_, 
-				&Nagios::Report::time2ddhhmmss($d),
-				&Nagios::Report::time2ddhhmmss($u) ;
+		sub {	
+		# sub {	$_ = shift @_; my %F = @_;
+		      	my $F = shift @_;
+		#      	$_ = shift @_; my $F = shift @_;
+			my $d = $F->{TOTAL_TIME_DOWN} ;
+			my $u = $F->{TOTAL_TIME_UNREACHABLE} ;
+			$F->{PERCENT_TOTAL_TIME_UP}	=~ s/%//;
+			$F->{TIME_DOWN_HHMMSS}		= t2hms($d) ;
+			$F->{TIME_UNREACH_HHMMSS}	= t2hms($u) ;
+			# push @$_, 
+				# &Nagios::Report::time2ddhhmmss($d),
+				# &Nagios::Report::time2ddhhmmss($u) ;
 			qw(TIME_DOWN_HHMMSS TIME_UNREACH_HHMMSS)
 		}
 ) ;

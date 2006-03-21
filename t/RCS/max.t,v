@@ -1,11 +1,31 @@
-#!/usr/bin/perl -w
+head	1.1;
+access;
+symbols;
+locks
+	sh1517:1.1; strict;
+comment	@# @;
 
-# $Id: max.t,v 1.1 2005-11-07 19:32:04+11 sh1517 Exp sh1517 $
 
-# $Log: max.t,v $
-# Revision 1.1  2005-11-07 19:32:04+11  sh1517
-# Initial revision
-#
+1.1
+date	2005.11.07.08.32.04;	author sh1517;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#!/usr/bin/perl -w
+
+# $Id$
+
+# $Log$
 
 use Test;
 
@@ -30,22 +50,23 @@ $max = &max_l(1..20) and		$max == 20
 
 EOTESTS
 
-@t = split /\n/, $tests ;
-@tests = grep !( m<\s*#> or m<^\s*$> ), @t ;
+@@t = split /\n/, $tests ;
+@@tests = grep !( m<\s*#> or m<^\s*$> ), @@t ;
 
-plan tests => scalar(@tests) ;
-# plan tests => scalar(@tests) + 1 ;
+plan tests => scalar(@@tests) ;
+# plan tests => scalar(@@tests) + 1 ;
 
 
-for ( @tests ) {
+for ( @@tests ) {
 
   $sub = eval "sub { $_ }" ;
 
-  warn "sub { $_ } fails to compile: $@"
-    if $@ ;
+  warn "sub { $_ } fails to compile: $@@"
+    if $@@ ;
 
   ok $sub  ;
 
   1 ;
 }
 
+@

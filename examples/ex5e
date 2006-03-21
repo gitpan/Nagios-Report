@@ -27,7 +27,7 @@ die $usage
 die $usage
   unless $opt_t =~ /^(?:today|yesterday|this(?:week|month|year)|last(?:week|month|year|24hours|12hours|7days|31days))/ ;
 
-my $x = Nagios::Report->new(q<web_page NagServer AuthUser Pw>, [ qw(24x7) ], $opt_t)
+my $x = Nagios::Report->new(q<web_page Nagios_Server Auth_Nagios_User Fgsltwhg>, [ qw(24x7) ], $opt_t)
   or die "Can't construct Nagios::Report object." ;
 
 $x->mkreport(

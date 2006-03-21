@@ -5,7 +5,7 @@ use strict ;
 
 use Nagios::Report ;
 
-my $x = Nagios::Report->new(q<local_cgi NagServer AuthUser>)
+my $x = Nagios::Report->new(q<local_cgi Nagios_Server Auth_Nagios_User>)
   or die "Can't construct Nagios::Report object." ;
 
 $x->mkreport(
@@ -26,14 +26,21 @@ $x->mkreport(
 
 		&comp(alpha => 0, ascend => 0, fields => [qw(TOTAL_TIME_DOWN TOTAL_TIME_UNREACHABLE)]),
 
-		sub {	$_ = shift @_; my %F = @_;
-			my $d = $F{TOTAL_TIME_DOWN} ;
-			my $u = $F{TOTAL_TIME_UNREACHABLE} ;
-			push @$_, 
-				&t2hms($d),
-				&t2hms($u) ;
+		sub {	
+			my $F = shift @_ ;
+			$F->{TOTAL_TIME_DOWN_HMS}	= t2hms($F->{TOTAL_TIME_DOWN}) ;
+			$F->{TOTAL_TIME_UNREACHABLE_HMS	= t2hms($F->{TOTAL_TIME_UNREACHABLE}) ;
 			qw(TOTAL_TIME_DOWN_HMS TOTAL_TIME_UNREACHABLE_HMS)
 		}
+
+#		sub {	$_ = shift @_; my %F = @_;
+#			my $d = $F{TOTAL_TIME_DOWN} ;
+#			my $u = $F{TOTAL_TIME_UNREACHABLE} ;
+#			push @$_, 
+#				&t2hms($d),
+#				&t2hms($u) ;
+#			qw(TOTAL_TIME_DOWN_HMS TOTAL_TIME_UNREACHABLE_HMS)
+#		}
 ) ;
 
 

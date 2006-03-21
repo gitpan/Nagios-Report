@@ -1,5 +1,19 @@
 #!/usr/bin/perl -w
 
+# $Id: st_et.t,v 1.3 2005-11-30 22:14:41+11 sh1517 Exp sh1517 $
+
+# $Log: st_et.t,v $
+# Revision 1.3  2005-11-30 22:14:41+11  sh1517
+# 1 Add more tests for the time patterns based on 'at' times
+#   under the __DEFAULT__ tag. All of these tests are hard to
+#   understand (and prob wrong).
+#
+# Revision 1.2  2005-11-28 10:28:13+11  sh1517
+# 1 Add tests for 'lastnhours' and 'lastndays'.
+#
+# Revision 1.1  2005-11-12 20:09:22+11  sh1517
+# Initial revision
+#
 
 use Test;
 

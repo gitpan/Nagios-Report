@@ -1,5 +1,18 @@
 #!/usr/bin/perl -w
 
+# $Id: t2hms.t,v 1.2 2005-12-18 16:59:01+11 sh1517 Exp sh1517 $
+
+# $Log: t2hms.t,v $
+# Revision 1.2  2005-12-18 16:59:01+11  sh1517
+# 1 Read test data from the __DATA__ handle (instead of using test data
+#   provided by the class).
+#   This follows changes to Report.pm to have the 'dev_debug' data source
+#   have a parm consisting of the name (sym ref) of a callback in the client
+#   that will provide the test data.
+#
+# Revision 1.1  2005-10-31 17:58:14+11  sh1517
+# Initial revision
+#
 
 use Test;
 

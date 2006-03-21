@@ -1,11 +1,31 @@
-#!/usr/bin/perl -w
+head	1.1;
+access;
+symbols;
+locks
+	sh1517:1.1; strict;
+comment	@# @;
 
-# $Id: before_start.t,v 1.1 2005-11-28 16:06:51+11 sh1517 Exp sh1517 $
 
-# $Log: before_start.t,v $
-# Revision 1.1  2005-11-28 16:06:51+11  sh1517
-# Initial revision
-#
+1.1
+date	2005.11.28.05.06.51;	author sh1517;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#!/usr/bin/perl -w
+
+# $Id$
+
+# $Log$
 
 use Test;
 
@@ -27,22 +47,23 @@ $si = Nagios::Report::before_start($now, $t - 3_600); $si == 0
 
 EOTESTS
 
-@t = split /\n/, $tests ;
-@tests = grep !( m<\s*#> or m<^\s*$> ), @t ;
+@@t = split /\n/, $tests ;
+@@tests = grep !( m<\s*#> or m<^\s*$> ), @@t ;
 
-plan tests => scalar(@tests) ;
-# plan tests => scalar(@tests) + 1 ;
+plan tests => scalar(@@tests) ;
+# plan tests => scalar(@@tests) + 1 ;
 
 
-for ( @tests ) {
+for ( @@tests ) {
 
   $sub = eval "sub { $_ }" ;
 
-  warn "sub { $_ } fails to compile: $@"
-    if $@ ;
+  warn "sub { $_ } fails to compile: $@@"
+    if $@@ ;
 
   ok $sub  ;
 
   1 ;
 }
 
+@

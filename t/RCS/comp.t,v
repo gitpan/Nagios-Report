@@ -1,11 +1,31 @@
-#!/usr/bin/perl -w
+head	1.1;
+access;
+symbols;
+locks
+	sh1517:1.1; strict;
+comment	@# @;
 
-# $Id: comp.t,v 1.1 2005-12-18 17:00:43+11 sh1517 Exp sh1517 $
 
-# $Log: comp.t,v $
-# Revision 1.1  2005-12-18 17:00:43+11  sh1517
-# Initial revision
-#
+1.1
+date	2005.12.18.06.00.43;	author sh1517;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#!/usr/bin/perl -w
+
+# $Id$
+
+# $Log$
 
 use Test;
 
@@ -159,19 +179,19 @@ $dt2 =~ /^Bendigo.+?^Kempsey_Optus.+?^Kempsey.+?^DUB.+?^Dubbo.+?^Thursday.+?^Alb
 
 EOTESTS
 
-@t = split /\n/, $tests ;
-@tests = grep !( m<\s*#> or m<^\s*$> ), @t ;
+@@t = split /\n/, $tests ;
+@@tests = grep !( m<\s*#> or m<^\s*$> ), @@t ;
 
-plan tests => scalar(@tests) ;
-# plan tests => scalar(@tests) + 1 ;
+plan tests => scalar(@@tests) ;
+# plan tests => scalar(@@tests) + 1 ;
 
 
-for ( @tests ) {
+for ( @@tests ) {
 
   $sub = eval "sub { $_ }" ;
 
-  warn "sub { $_ } fails to compile: $@"
-    if $@ ;
+  warn "sub { $_ } fails to compile: $@@"
+    if $@@ ;
 
   ok $sub  ;
 
@@ -180,12 +200,12 @@ for ( @tests ) {
 
 sub aeq {
 
-  my ($ar1, $ar2) = @_ ;
+  my ($ar1, $ar2) = @@_ ;
 
   # compare two arrays passed by ref
 
   return 0
-    unless scalar(@$ar1) == scalar(@$ar2) ;
+    unless scalar(@@$ar1) == scalar(@@$ar2) ;
 
   foreach my $i (0..$#$ar1) {
 
@@ -197,3 +217,4 @@ sub aeq {
 
 }
 
+@

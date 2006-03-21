@@ -39,7 +39,8 @@ $x->mkreport(
 							# sub { my $u = $_{PERCENT_TOTAL_TIME_UP}; $u =~ s/%//; print "\$u: $u\n"; $u < 98 },
 
 		\&by_down_time,
-		sub { push @$_, 'F1_VALUE', 'F2_VALUE'; qw(F1 F2) }
+		sub { my $F = shift @_; $F->{F1} = 'F1_VALUE'; $F->{F2} = 'F2_VALUE'; qw(F1 F2) }
+		# sub { push @$_, 'F1_VALUE', 'F2_VALUE'; qw(F1 F2) }
 ) ;
 
 

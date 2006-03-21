@@ -23,13 +23,19 @@ $x->mkreport(
 
 		&comp( alpha => 0, ascend => 0, fields => [qw(TOTAL_TIME_DOWN TOTAL_TIME_UNREACHABLE)] ),
 
-		sub {	$_ = shift @_;
-			my %F = @_;
-			my $d = $F{TOTAL_TIME_DOWN} ;
-			my $u = $F{TOTAL_TIME_UNREACHABLE} ;
-			push @$_, 
-				&t2hms($d),
-				&t2hms($u) ;
+		sub {
+		# sub {	$_ = shift @_;
+			my $F = shift @_;
+			# my %F = @_;
+			my $d = $F->{TOTAL_TIME_DOWN} ;
+			my $u = $F->{TOTAL_TIME_UNREACHABLE} ;
+			$F->{TOTAL_TIME_DOWN_HMS}	= t2hms($d) ;
+			$F->{TOTAL_TIME_UNREACHABLE_HMS}= t2hms($u) ;
+			# my $d = $F{TOTAL_TIME_DOWN} ;
+			# my $u = $F{TOTAL_TIME_UNREACHABLE} ;
+			# push @$_, 
+				# &t2hms($d),
+				# &t2hms($u) ;
 			qw(TOTAL_TIME_DOWN_HMS TOTAL_TIME_UNREACHABLE_HMS)
 		}
 ) ;

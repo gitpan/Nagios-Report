@@ -14,7 +14,7 @@ use vars qw($VERSION @EXPORT @EXPORT_OK %stime_etime);
 
 @EXPORT = qw(d2t t2hms comp max_l %st_et i2t) ;
 
-$VERSION = '0.001';
+$VERSION = '0.002' ;
 
 use constant REQUEST_METHOD		=> 'GET' ;
 
@@ -294,8 +294,19 @@ sub new {
 
   $me->{REPORTS}	= {} ;
   $me->{REPORT_PERIODS}	= [ @report_period ] ;
-  my ($t1, $t2)		= exists $stime_etime{$time_period}	? $stime_etime{$time_period}->($time_period, [ localtime ])
-								: $stime_etime{__DEFAULT__}->( $time_period, [ localtime ]) ;
+							# Date ranges: $time_period =~ start_at_date / \s* - \s*/x  end_at_date
+							# start and end at_dates look like time stamps.
+  my ($t1, $t2) ;
+  if ( my ($s, $e) = $time_period =~ /^([^-]+)-([^-]+)$/ ) {
+							# XXX
+    $s =~ s/\s+$// ;
+    $e =~ s/^\s+// ;
+    ($t1, undef) = $stime_etime{__DEFAULT__}->( $s, [ localtime ]) ;
+    ($t2, undef) = $stime_etime{__DEFAULT__}->( $e, [ localtime ])
+  } else {
+    ($t1, $t2)		= exists $stime_etime{$time_period}	? $stime_etime{$time_period}->($time_period, [ localtime ])
+								: $stime_etime{__DEFAULT__}->( $time_period, [ localtime ])
+  }
 
   my $data ;
    $source_tag          =~ s/dev_debug/dev_debug BOGON_SERVER/
@@ -458,7 +469,7 @@ USAGE
 
   my @field_names = scalar(@$these_fields) ? @$these_fields : @{ $me->{FIELDNAMES} } ;
   my @fieldnames  = @{ $me->{FIELDNAMES} } ;
-  my %fields      = %{$me->{FIELDS}} ;
+  my %fields      = %{ $me->{FIELDS} } ;
 
 							# map 
 							#     slice
@@ -482,7 +493,7 @@ USAGE
     next
       unless @avail_recs ;
 
-    @r          = ( shift @avail_recs ) ;
+    @r          = shift @avail_recs ;
 
     $add_downs  = 0
       unless $me->{SOURCE_TAG} =~ /^(?:web_page|local_cgi)/ ;
@@ -502,12 +513,16 @@ USAGE
       my @downs       = @r ;
       @F{@fieldnames} = @{$r[0]} ;
 							# XXX - don't modify the rec, only get the added fields.
-      my @afn         =  $alter->($r[0], %F) ;
+      my @afn         =  $alter->(\%F) ;
+      # my @afn         =  $alter->($r[0], \%F) ;
+      # my @afn         =  $alter->($r[0], %F) ;
       push @fieldnames,  @afn ;
       push @field_names, @afn
         unless grep $_ eq $afn[0], @field_names ;
       @r              =
-        map { @F{@fieldnames} = @$_; $alter->($_, %F); $_ } @downs ;
+        map { @F{@fieldnames} = @$_; $alter->(\%F); [ @F{@fieldnames} ] } @downs ;
+        # map { @F{@fieldnames} = @$_; $alter->($_, \%F); [ @F{@fieldnames} ] } @downs ;
+        # map { @F{@fieldnames} = @$_; $alter->($_, %F); $_ } @downs ;
     }
 
     $me->{FIELDNAMES}    = [ @fieldnames ] ;
@@ -521,9 +536,12 @@ USAGE
     push @r,
 		map {
 			@F{@fieldnames} = @$_ ;
-			$alter->($_, %F)
+			$alter->(\%F)
+			# $alter->($_, \%F)
+			# $alter->($_, %F)
 			  if $alter ;
-			$_
+			[ @F{@fieldnames} ]
+			# $_
 		    }
 		map {
 			$add_downs 
@@ -548,7 +566,7 @@ USAGE
 
 
 sub excel_dump {
-  my ($me, $excel_filename) = @_ ;
+  my ($me, $excel_filename, $chart_details) = @_ ;
 
   eval { require Spreadsheet::WriteExcel } ;
   die "John McNamara's _excellent_ CPAN module, Spreadsheet::WriteExcel is needed by excel_dump(). Outahere. "
@@ -619,6 +637,9 @@ sub excel_dump {
       $row++ ;
     }
   }
+
+  &add_chart($workbook, $chart_details) 
+    if $chart_details ;
 
 }
 
@@ -923,8 +944,26 @@ sub down_records {
 
   foreach (@down_recs) {
 
+=begin comment
+
+							# Must also deal with scheduled downtime.
+
+  01-02-2006 00:00:00  01-02-2006 14:27:54  0d 14h 27m 54s  HOST UP (HARD)  PING OK - Packet loss = 0%, RTA = 7.26 ms  
+  02-02-2006 20:24:42  02-02-2006 20:24:42  0d 0h 0m 0s     HOST DOWN (HARD)  CRITICAL - Plugin timed out after 10 seconds  
+
+							VVVV This appears to be the correct entry
+  02-02-2006 20:24:42  02-02-2006 20:47:54  0d 0h 23m 12s   HOST DOWNTIME START  Start of scheduled downtime  
+							^^^^
+  02-02-2006 20:47:54  02-02-2006 22:24:42  0d 1h 36m 48s   HOST UP (HARD)  PING OK - Packet loss = 0%, RTA = 0.66 ms  
+  02-02-2006 22:24:42  03-02-2006 12:54:29  0d 14h 29m 47s  HOST DOWNTIME END  End of scheduled downtime  
+
+=end comment
+
+=cut
+
+
     next
-      if /HOST UP|SERVICE OK/ ;
+      if /HOST UP|SERVICE OK|HOST DOWNTIME END/ ;
 
     my ($down, $up, $outage) = /
 				(\d+-\d+-\d+ \s+ \d+:\d+:\d+) \s+
@@ -1029,9 +1068,70 @@ sub report {
   			} ;
 }
 
+
+sub to_dbh {
+  my $me = shift @_ ;
+
+  eval { require DBI } ;
+  die "Jeff Zuckers's _excellent_ CPAN module, DBI is needed by to_dbh(). Outahere. "
+	if $@ ;
+
+  my @dbh = () ;
+							# Fruitless attempts to silence DBI - 
+							# this appears to be a known issue of DBD::AnyData
+							# as of Mar 2006.
+
+							# local $SIG{__WARN__} = sub {} ;
+
+  foreach my $rep_period ( @{$me->REPORT_PERIODS} ) {
+
+    my $dbh = DBI->connect('dbi:AnyData:') ;
+							# my $dbh = DBI->connect('dbi:AnyData(Warn => 0, ...
+							# Also fails to check warnings.
+    $dbh->func(
+	"tab_${rep_period}",
+	'ARRAY',
+	$me->{AVAIL_REPORTS}{$rep_period},
+	# [ $me->avail($rep_period) ],
+	{ col_names => join(',', @{$me->FIELDNAMES}) },
+	'ad_import'
+    ) ;
+
+    push @dbh, $dbh ;
+
+  }
+
+  @dbh ;
+
+}
+
+sub add_chart {
+  my ($wkbook, $chart) = @_ ;
+
+  die "add_chart() called without hash ref to chart details eg { template => '/path/to/chart/template', link => .. }. Outahere."
+    unless ref($chart) eq 'HASH' ;
+
+  die "add_chart() called without a well formed 'template' value in \$chart_detail. Must be to a filename containing the Chart template. Outahere."
+    unless exists($chart->{template}) && $chart->{template} && -e $chart->{template} && -s $chart->{template} ;
+
+							# Add some extra formats to cover formats used in the charts.
+
+  $wkbook->add_format(color => 1, bold => 1);
+  $wkbook->add_format(color => 2);
+  $wkbook->add_format(color => 3);
+
+  $chart->{title} ||= 'Chart 24x7' ;
+  $chart->{link}  ||= q<'24x7'!$A$1:$B$15>,
+
+  $wkbook->add_chart_ext($chart->{template}, $chart->{title}) ;
+
+  $wkbook->sheets(0)->store_formula($chart->{link}) ;
+
+}
+   
+ 
 1 ;
-
-
+ 
 # ---> That's all folks <-----
 
 =head1 NAME
@@ -1100,11 +1200,9 @@ Nagios::Report - Perl class to filter and munge Nagios availability data
 
 							# Add 2 fields for downtime vals in hours minutes and secs.
 
-		sub {	$_ = shift @_;
-			my %F = @_;
-			push @$_, 
-				&t2hms($F{TOTAL_TIME_DOWN} ),
-				&t2hms($F{TOTAL_TIME_UNREACHABLE} ) ;
+		sub {	$F = shift @_;
+			$F->{TIME_DOWN_HHMMSS}	=	t2hms( $F->{TOTAL_TIME_DOWN} ),
+			$F->{TIME_UNREACH_HHMMSS}=	t2hms( $F->{TOTAL_TIME_UNREACHABLE} ) ;
 			qw(TIME_DOWN_HHMMSS TIME_UNREACH_HHMMSS)
 		    }
 
@@ -1132,7 +1230,7 @@ exactly the same - as that CGI.
 
 =over 4
 
-=item * new (DATA_SOURCE, REPORT_PERIODS, TIME_PERIODS, HOST_OR_SERVICE, PRE_FILTER)
+=item * new (DATA_SOURCE, REPORT_PERIODS, TIME_PERIOD, HOST_OR_SERVICE, PRE_FILTER)
 
 
 This is the constructor of the Nagios::Report object.
@@ -1156,10 +1254,17 @@ C<REPORT_PERIODS> is an optional reference to a list of names of Nagios time per
 
 C<TIME_PERIOD> is an optional specification of the interval containing eligible availability records. It is scalar whose value 
 is one of the Nagios interval names such as C<thisday>, C<thismonth>, or B<some> of the time forms used by the B<at> command.
-(These forms include HHMM, HH:MM, DD.MM.YYYY MM/DD/YYYY and 24hour time date).
-The timeperiod specifies an interval from some time in the past to now from which availability data will be selected.
-If this argument is 
-omitted, the report is compiled for the B<thismonth> time period (ie any host availability record from the first of the current
+(These forms include HHMM, HH:MM, DD.MM.YYYY MM/DD/YYYY and 24hour-time date).
+
+
+Usually the timeperiod specifies an interval from some time in the past to now from which availability data will be selected.
+
+
+However, if the argument is of the form B<start_24hour-time_date> B<-> B<end_24hour-time_date>, the availability data will be extracted from
+the corresponding interval.
+
+
+If this argument is omitted, the report is compiled for the B<thismonth> time period (ie any host availability record from the first of the current
 month to the current time).
 
 C<HOST_OR_SERVICE> is an optional scalar specifying the service report instead of the host report. If not set, the host
@@ -1203,14 +1308,27 @@ $a->[$f{TOTAL_TIME_DOWN}] <=> $b->[$f{TOTAL_TIME_DOWN}]
 to sort the records based on the field values.
 
 C<MUNGE_CALLBACK> is a reference to a user supplied subroutine that is used to munge (transform input to output) the records. The subroutine
-is called with a pointer to a record and a list of field names and their values for this record. The callback is expected to modify the record
-in place, munging fields with expressions like
+is called with a pointer to a hash of field names and their values for this record. The callback is expected to modify the record
+by setting the values of this hash, munging fields with expressions like
 
-$F{TOTAL_DOWN_TIME} = 0
+	$F->{TOTAL_TIME_DOWN} = 0
 
-and or adding fields and their values.
+If the callback adds fields to the record, it should add the new field value in the same way (by setting a value for
+a new key in the hash, like for example,
 
-If the callback adds fields to the record, it should append them to the end of the record and return the list of field names to mkreport().
+	$F->{TOTAL_TIME_DOWN_HMS} = t2hms($F->{TOTAL_TIME_DOWN})
+
+).
+
+If the callback adds no fields (modifies values only), it B<must> return an empty list.
+
+A complete callback to set TOTAL_TIME_DOWN to zero is therefore
+
+  sub {
+  	my $F = shift @_;
+	$F->{TOTAL_TIME_DOWN} = 0;
+	()
+  }
 
 mkreport() takes the availability data for each time period, adds outage data (which involves duplicating the
 C<original> availability record as many times as there are outages), does any specified munging,  applies the filter discarding
@@ -1229,6 +1347,7 @@ Since the availability data is repeated for each outage record, C<DOWNS> can mak
 with a small number of report fields (eg HOST_NAME, PERCENT_TOTAL_UP_TIME). Also, since the outage records are added B<before>
 filtering by the selector callback, you B<should> set a pre-filter in the constructor.
 
+
 The callbacks are run in this order
 
 =over 4
@@ -1246,14 +1365,68 @@ The callbacks are run in this order
 
 =back
 
+=item * to_dbh
 
-=item * excel_dump (EXCEL_FILENAME)
+If the DBD::AnyData module is installed, returns an array of DBI data handles
+connected to the pseudo-databases containing one table populated
+with the availability data corresponding to each of the REPORT_PERIODS
+specified in the constructor call.
+
+Each table is named C<tab_REPORT_PERIOD>. For example, after constructing the
+Nagios::Report object with the default report period, the table is named B<tab_24x7>.
+
+This method allows the use of SQL statements as an alternative means of filtering
+and modifying the data. For example,
+
+  $SQL =<<SQL;
+  SELECT host_name,
+       total_time_down,
+       time_down_scheduled,
+       time_down_unscheduled,
+  FROM tab_24x7
+    WHERE total_time_down   >= 300
+  SQL
+
+  $x   = Nagios::Report->new(local_cgi Nagios-server Nagios-contact) ;
+  ($d) = $x->to_dbh ;
+  $s   = $d->prepare($SQL) ;
+  $s->execute ;
+  $s->dump_results ;
+
+Unfortunately, the use of DBD::AnyData does not invalidate this module because
+the SQL grammar implemented by SQL::Statement (on behalf of DBD::AnyData) is not as
+extensive as the SQL grammar provided by an RDBMS. If one
+is determined to process with SELECT, load the data into an RDBMS of choice ( 
+MySQL comes to mind) and use the corresponding Perl DBD module on that. There is an example of
+a script to do so included in the distribution.
+
+Also, as of version 0.002, there are noisy complaints from DBI when DBD::AnyData
+processes SQL. This appears to be a well known problem (Mar 2006) with
+AnyData. 
+
+=item * excel_dump (EXCEL_FILENAME, CHART_DETAIL)
 
 excel_dump writes a Workbook in the specified filename. The workbook contains a worksheet for each report (ie one for each time period
 specified by the constructor). excel_dump() requires the John McNamara's B<excellent> CPAN module, Spreadsheet::WriteExcel.
 
 E<10>
 C<EXCEL_FILENAME> is the path of the file in which the Excel workbook will be written.
+
+C<CHART_DETAIL> is an optional reference to a hash that specifies the details of an Excel Chart that will be linked to the
+data from the report.
+
+The keys of his hash are
+
+E<10>
+template - the path to a binary file, produced by the Spreadsheet::WriteExcel chartex utility, containing the
+chart to be linked to the data. 
+
+link - an optional scalar that specifies the data to be linked to the chart. Defaults to "q<'24x7'!$A$1:$B$15>".
+You almost certainly will need to change this.
+
+title - an optional scalar that specifies the name of the chart to be added to the workbook. Defaults to '24x7 Chart'.
+
+Note that only one chart can be added to a workbook (by this module).
 
 =item * csv_dump 
 
@@ -1277,6 +1450,7 @@ than hand back a ref.
 
 Accessor that returns, in scalar context, an iterator that when kicked returns each of the
 records produced by mkreport() for that report period; in array context, returns the list of those records.
+
 Note that the 'records' are refs to anonymous lists containing only those fields specified by the field list parameter of
 mkreport().
 
@@ -1284,7 +1458,8 @@ mkreport().
 
 Accessor that returns, in scalar context, an iterator that when kicked returns each of the
 records returned by the constructor; in array context, returns the list of those records.
-Note that the 'records' are refs to anonymous lists containing all of the Nagios availability report fields.
+Note that the 'records' are refs to anonymous lists containing all of the Nagios availability report fields
+augmented by the two extra fields AVAIL_URL and TREND_URL (vi).
 
 The iterator is a code ref that, when called, will return a ref to the next
 availability record. Without a REPORT_PERIOD,
@@ -1332,7 +1507,10 @@ Ref to a hash keyed by report period containing a ref to a list containing all
 those records returned by the Nagios availability report that are accepted by the
 pre-filter.
 
-Unlike REPORTS, each record contains all the Nagios reporting fields.
+Unlike REPORTS, each record contains all the Nagios reporting fields including
+the fields AVAIL_URL and TREND_URL whose values are hyperlinks to the Nagios
+trend and availability reports for the host named HOST_NAME.
+
 
 See avail (REPORT_PERIOD).
 
@@ -1399,6 +1577,11 @@ eg 3h 5m 30s (3 hours 5 minutes and 30 seconds).
 =item * The B<comp()> subroutine does not behave well if called with fields whose values are non numeric.
 
 =item * Anything good in this module comes from B<Higher Order Perl>; the rest comes from the author.
+
+=item * The module does not buy much more than rolling ones own with DBD::AnyData. Had I been more
+        aware of the fundamental utility and importance of RDBMS data, this module would probably
+        not exist. OTOH, this module now provides some sort of programmatic access to Nagios availability
+        data that Nagios has not had (AFAIK) hitherto.
 
 =back
 

@@ -2,6 +2,8 @@ Changes
 Makefile.PL
 MANIFEST
 Report.pm
+RCS/Report.pm,v
+RCS/Makefile.PL,v
 META.yml                                 Module meta-data (added by MakeMaker)
 TODO
 t/constructor.t
@@ -17,6 +19,17 @@ t/another_obj_dump
 t/obj_dump
 t/test_data
 t/before_start.t
+t/RCS/constructor.t,v
+t/RCS/t2hms.t,v
+t/RCS/max.t,v
+t/RCS/mkreport.t,v
+t/RCS/csv_dump.t,v
+t/RCS/excel_dump.t,v
+t/RCS/debug_dump.t,v
+t/RCS/st_et.t,v
+t/RCS/comp.t,v
+t/RCS/before_start.t,v
+examples/chart01.bin
 examples/ex1
 examples/ex1.out
 examples/ex1a
@@ -55,5 +68,9 @@ examples/ex5_comp_by_max_downtime_down
 examples/ex5_comp_by_max_downtime_up
 examples/ex_iterator
 examples/Nagios_Availability_Report-MTD
+examples/Nagios_Availability_Report-MTD_chart
+examples/sql_ex1
+examples/sql_ex2
+examples/load_month_avail_records
 examples/y
 examples/x.csv

@@ -81,7 +81,7 @@ my $pre_filter = $opt_h
 	: sub { my %F = @_; $F{TOTAL_TIME_DOWN} > 300 } ;
 
 my $x = Nagios::Report->new(
-				q<local_cgi NagServer AuthUser>,
+				q<local_cgi Nagios_Server Auth_Nagios_User>,
 				[ qw(24x7) ],
 				$opt_t,
 				0,

@@ -46,7 +46,7 @@ die $usage
 
 my $x = Nagios::Report->new(
 							# Data source
-				q<local_cgi NagServer AuthUser>,
+				q<local_cgi Nagios_Server Auth_Nagios_User>,
 							# Report period
 				[ qw(24x7) ],
 							# Time period
