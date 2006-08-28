@@ -1,18 +1,4 @@
 
-# $Id: Makefile.PL,v 1.4 2005-12-01 19:36:42+11 sh1517 Exp sh1517 $
-
-# $Log: Makefile.PL,v $
-# Revision 1.4  2005-12-01 19:36:42+11  sh1517
-# 1 Set date format (badly) from nagios.cfg to be either 'euro' or 'us'.
-#
-# Revision 1.3  2005-11-24 17:43:25+11  sh1517
-# Correct spacing of replaced constant values.
-#
-# Revision 1.2  2005-11-23 15:42:07+11  sh1517
-# 1 Edit the module text to set the paths to the CGIs etc.
-#
-# Revision 1.1  2005-11-22 19:08:32+11  sh1517
-# Initial revision
 #
 
 use File::Find ;
@@ -107,7 +93,7 @@ if ( $nag_cfg ) {
       if /^date_format=(\w+)/ ;
   }
 
-  $euro_date = $date_format && ($date_format eq 'euro') ;
+  $euro_date = $date_format && ($date_format eq 'euro') ? 1 : 0 ;
 }
 
 my $lynx_or_wget = !! ($lynx || $wget) ;

@@ -15,3 +15,14 @@ Revision history for Perl extension Nagios::Report.
 	- added primitive support for chart templates to excel_dump. The workbook written by
 	Spreadsheet::WriteExcel can contain _one_ (1) chart of the avail data.
 
+0.003 Wed Aug 23 14:31:56 EST 2006
+	. fix bug in handling US style dates (Don Collins)
+	. allow use 'Mar 20006' (to select an arbitrary month) in constructor
+	. add some tests of the named Month facility (t/st_et.t)
+    . refactor the __DEFAULT__ handler of the %stime_etime despatch table to use
+      ternary (what C calls 'conditional') statements instead of cascaded if-then-else
+    . allow time selectors to have an optional argument of a datetime. This allows
+      tests to be pre-genned with known dates rather than having to dynamically cope with
+      whatever time the test is called at (see gen_tests, which generates t/st_et_2.t).
+	. modify examples/host_down_report to accept named Months as time option.
+

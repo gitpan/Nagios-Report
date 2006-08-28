@@ -1,22 +1,5 @@
 #!/usr/bin/perl -w
 
-# $Id: csv_dump.t,v 1.3 2005-12-18 17:01:46+11 sh1517 Exp sh1517 $
-
-# $Log: csv_dump.t,v $
-# Revision 1.3  2005-12-18 17:01:46+11  sh1517
-# 1 Read test data from the __DATA__ handle (instead of using test data
-#   provided by the class).
-#   This follows changes to Report.pm to have the 'dev_debug' data source
-#   have a parm consisting of the name (sym ref) of a callback in the client
-#   that will provide the test data.
-#
-# Revision 1.2  2005-12-17 19:31:50+11  sh1517
-# 1 Correct the report_periods parm in the constructor call.
-#   This parm is a ref to a list of 'report_periods' (ie time periods
-#   during which outages are significant), not a scalar.
-#
-# Revision 1.1  2005-11-01 21:51:35+11  sh1517
-# Initial revision
 #
 
 use Test;

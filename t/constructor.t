@@ -1,25 +1,5 @@
 #!/usr/bin/perl -w
 
-# $Id: constructor.t,v 1.4 2005-12-18 16:58:43+11 sh1517 Exp sh1517 $
-
-# $Log: constructor.t,v $
-# Revision 1.4  2005-12-18 16:58:43+11  sh1517
-# 1 Read test data from the __DATA__ handle (instead of using test data
-#   provided by the class).
-#   This follows changes to Report.pm to have the 'dev_debug' data source
-#   have a parm consisting of the name (sym ref) of a callback in the client
-#   that will provide the test data.
-#
-# Revision 1.3  2005-12-17 19:37:55+11  sh1517
-# 1 Correct use of 'report_periods' parm in constructor.
-#   This parm is a ref to list of time periods (during which
-#   outages are significant) and not a scalar.
-#
-# Revision 1.2  2005-10-31 20:32:12+11  sh1517
-# 1 Add more tests.
-#
-# Revision 1.1  2005-10-31 20:11:04+11  sh1517
-# Initial revision
 #
 
 use Test;

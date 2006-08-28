@@ -1,10 +1,5 @@
 #!/usr/bin/perl -w
 
-# $Id: before_start.t,v 1.1 2005-11-28 16:06:51+11 sh1517 Exp sh1517 $
-
-# $Log: before_start.t,v $
-# Revision 1.1  2005-11-28 16:06:51+11  sh1517
-# Initial revision
 #
 
 use Test;
@@ -20,7 +15,9 @@ $tests = <<'EOTESTS' ;
 # Scalar expression 
 # 1==1,
 
-($s, $m, $h, $d, $mm, $y)=localtime; $now="$d-" . ($mm +1) . '-' . ($y + 1900) . "  $h:$m:$s"; $t=time(); $si=Nagios::Report::before_start($now, $t - 1); $si == 0
+($s, $m, $h, $d, $mm, $y) = localtime; $now = (Nagios::Report::EURO_DATE ? "$d-" . ($mm + 1) : ($mm + 1) . "-$d") . '-' . ($y + 1900) . " $h:$m:$s"; $t=time()
+# ($s, $m, $h, $d, $mm, $y) = localtime; ($s, $m, $h) = map length($_) < 2 ? "0$_" : $_, ($s, $m, $h); $now = (Nagios::Report::EURO_DATE ? "$d-" . ($mm + 1) : ($mm + 1) . "-$d") . '-' . ($y + 1900) . " $h:$m:$s"; $t=time()
+$si = Nagios::Report::before_start($now, $t - 1);     $si == 0
 $si = Nagios::Report::before_start($now, $t + 3_600); $si == 1
 $si = Nagios::Report::before_start($now, $t - 3_600); $si == 0
 
